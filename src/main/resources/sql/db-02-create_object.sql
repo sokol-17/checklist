@@ -1,17 +1,17 @@
 -- создание необходимых объектов
 -- таблица типов элементов чек-листов
-create table if not exists checklist_item_type (
+create table if not exists item_type (
     id    serial
   , code  varchar(15) not null
   , name  varchar(50) not null
   , descr text
 );
 
-alter table if exists checklist_item_type add constraint chechlist_item_type_id_pk primary key (id);
+alter table if exists item_type add constraint item_type_id_pk primary key (id);
 
-alter table if exists checklist_item_type add constraint checklist_item_type_code_uk unique (code);
+alter table if exists item_type add constraint item_type_code_uk unique (code);
 
-alter sequence if exists checklist_item_type_id_seq restart with 10000;
+alter sequence if exists item_type_id_seq restart with 10000;
 
 -- таблица чек-листов
 create table if not exists checklist (
@@ -25,7 +25,7 @@ alter table if exists checklist add constraint checklist_id_pk primary key (id);
 alter sequence if exists checklist_id_seq restart with 10000;
 
 -- таблица элементов чек-листов
-create table if not exists checklist_item (
+create table if not exists item (
     id           bigserial
   , type_id      integer     not null
   , checklist_id bigint      not null  
@@ -34,17 +34,17 @@ create table if not exists checklist_item (
   , descr        text
 );
 
-alter table if exists checklist_item add constraint checklist_item_id_pk primary key (id);
+alter table if exists item add constraint item_id_pk primary key (id);
 
-alter table if exists checklist_item add constraint checklist_item_type_id_fk foreign key (type_id) references checklist_item_type(id);
+alter table if exists item add constraint item_type_id_fk foreign key (type_id) references item_type(id);
 
-create index if not exists checklist_item_type_id_idx on checklist_item(type_id);
+create index if not exists item_type_id_idx on item(type_id);
 
-alter table if exists checklist_item add constraint checklist_item_checklist_id_fk foreign key (checklist_id) references checklist(id);
+alter table if exists item add constraint item_checklist_id_fk foreign key (checklist_id) references checklist(id);
 
-create index if not exists checklist_item_checklist_id_idx on checklist_item(checklist_id);
+create index if not exists item_checklist_id_idx on item(checklist_id);
 
-alter sequence if exists checklist_item_id_seq restart with 10000;
+alter sequence if exists item_id_seq restart with 10000;
 
 -- таблица иерархий проверяемых объектов
 create table if not exists checked_object (
