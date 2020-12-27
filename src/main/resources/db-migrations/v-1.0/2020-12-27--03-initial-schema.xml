@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="2020-12-27-02-010" author="Vladimir">
+        <comment>Типы элементов чек-листов</comment>
+        <createTable tableName="item_type" remarks="Типы элементов чек-листов">
+            <column name="id" type="bigint" remarks="Идентификатор" autoIncrement="true" startWith="10000">
+                <constraints primaryKeyName="item_type_id_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="varchar(15)" remarks="Код">
+                <constraints uniqueConstraintName="item_type_code_uk" unique="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)" remarks="Название">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text" remarks="Описание"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="item_type"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2020-12-27-02-020" author="Vladimir">
+        <comment>Заполнение типов элементов чек-листов</comment>
+        <insert tableName="item_type">
+            <column name="id" valueNumeric="10"/>
+            <column name="code" value="label"/>
+            <column name="name" value="Этикетка"/>
+            <column name="description" value="Текстовое поле без возможности изменения"/>
+        </insert>
+        <insert tableName="item_type">
+            <column name="id" valueNumeric="20"/>
+            <column name="code" value="number"/>
+            <column name="name" value="Числовое поле"/>
+            <column name="description" value="Поле для ввода числовых значений"/>
+        </insert>
+        <insert tableName="item_type">
+            <column name="id" valueNumeric="30"/>
+            <column name="code" value="text"/>
+            <column name="name" value="Текстовое поле"/>
+            <column name="description" value="Текстовое поле"/>
+        </insert>
+        <insert tableName="item_type">
+            <column name="id" valueNumeric="40"/>
+            <column name="code" value="date"/>
+            <column name="name" value="Дата и время"/>
+            <column name="description" value="Дата и время"/>
+        </insert>
+        <insert tableName="item_type">
+            <column name="id" valueNumeric="50"/>
+            <column name="code" value="choice"/>
+            <column name="name" value="Выбор одного элемента"/>
+            <column name="description" value="Выбор одного элемента из нескольких"/>
+        </insert>
+        <insert tableName="item_type">
+            <column name="id" valueNumeric="60"/>
+            <column name="code" value="multi_choice"/>
+            <column name="name" value="Выбор нескольких элементов"/>
+            <column name="description" value="Множественный выбор из нескольких элементов"/>
+        </insert>
+        <insert tableName="item_type">
+            <column name="id" valueNumeric="70"/>
+            <column name="code" value="interval"/>
+            <column name="name" value="Интервальные значения"/>
+            <column name="description" value="Возможно этот тип должен быть на другом уровне"/>
+        </insert>
+        <insert tableName="item_type">
+            <column name="id" valueNumeric="100"/>
+            <column name="code" value="custom"/>
+            <column name="name" value="Кастомный тип"/>
+            <column name="description" value="Кастомный тип"/>
+        </insert>
+        <rollback>
+            <delete tableName="item_type">
+                <where>id in (10, 20, 30, 40, 50, 60, 70, 100)</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2020-12-27-02-030" author="Vladimir">
+        <comment>Значения для выборов из списков (справочники)</comment>
+        <createTable tableName="value_list" remarks="Списки возможных значений">
+            <column name="id" type="bigint" remarks="Идентификатор" autoIncrement="true" startWith="10000">
+                <constraints primaryKeyName="value_list_id_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="parent_id" type="bigint" remarks="Ссылка на список">
+                <constraints foreignKeyName="value_list_parent_id_fk" referencedTableName="value_list"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="value" type="varchar(100)" remarks="Название списка, если parent_id is null, иначе значение">
+            </column>
+            <column name="description" type="text" remarks="Описание"/>
+        </createTable>
+        <createIndex tableName="value_list" indexName="value_list_parent_id_idx">
+            <column name="parent_id"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="value_list"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2020-12-27-02-040" author="Vladimir">
+        <comment>Чек-листы</comment>
+        <createTable tableName="checklist" remarks="Чек-листы">
+            <column name="id" type="bigint" remarks="Идентификатор" autoIncrement="true" startWith="10000">
+                <constraints primaryKeyName="checklist_id_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)" remarks="Название">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text" remarks="Описание"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="checklist"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2020-12-27-02-050" author="Vladimir">
+        <comment>Элементы чек-листов</comment>
+        <createTable tableName="item" remarks="Элементы чек-листов">
+            <column name="id" type="bigint" remarks="Идентификатор" autoIncrement="true" startWith="10000">
+                <constraints primaryKeyName="item_id_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="type_id" type="bigint" defaultValueNumeric="10" remarks="Тип элемента">
+                <constraints foreignKeyName="item_type_id_fk" referencedTableName="item_type" referencedColumnNames="id"
+                             nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)" remarks="ФИО">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_required" type="boolean" defaultValueBoolean="false" remarks="Обязателен к выполнению?">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_available" type="boolean" defaultValueBoolean="true" remarks="Доступен?">
+                <constraints nullable="false"/>
+            </column>
+            <column name="list_id" type="bigint" remarks="Список значений (для выбора из списка)">
+                <constraints foreignKeyName="item_type_list_id_fk" referencedTableName="value_list"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="mask" type="varchar(50)" remarks="Маска (для чисел, дат)"/>
+            <column name="min" type="numeric" remarks="Минимальное значение (для чисел)"/>
+            <column name="max" type="numeric" remarks="Максимальное значение (для чисел)"/>
+            <column name="description" type="text" remarks="Описание"/>
+        </createTable>
+        <createIndex tableName="item" indexName="item_type_id_idx">
+            <column name="type_id"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="item"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2020-12-27-02-060" author="Vladimir">
+        <comment>Связь чек-листов и элементов</comment>
+        <createTable tableName="crs_checklist_item" remarks="Связь чек-листов и элементов">
+            <column name="id" type="bigint" remarks="Идентификатор" autoIncrement="true" startWith="10000">
+                <constraints primaryKeyName="crs_checklist_item_id_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="checklist_id" type="bigint" remarks="Чек-лист">
+                <constraints foreignKeyName="checklist_id_fk" referencedTableName="checklist" referencedColumnNames="id"
+                             nullable="false"/>
+            </column>
+            <column name="item_id" type="bigint" remarks="Элемент чек-листа">
+                <constraints foreignKeyName="crs_checklist_item_item_id_fk" referencedTableName="item"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="serial_number" type="bigint" remarks="Порядковый номер"/>
+        </createTable>
+        <createIndex tableName="crs_checklist_item" indexName="crs_checklist_item_checklist_id_item_id_idx">
+            <column name="checklist_id"/>
+            <column name="item_id"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="crs_checklist_item"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2020-12-27-02-070" author="Vladimir">
+        <comment>Объекты проверки</comment>
+        <createTable tableName="object" remarks="Объекты проверки">
+            <column name="id" type="bigint" remarks="Идентификатор" autoIncrement="true" startWith="10000">
+                <constraints primaryKeyName="object_id_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="parent_id" type="bigint" remarks="Родительский объект (для иерархических объектов)">
+                <constraints foreignKeyName="object_parent_id_fk" referencedTableName="object"
+                             referencedColumnNames="id" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)" remarks="Название">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text" remarks="Описание"/>
+        </createTable>
+        <createIndex tableName="object" indexName="check_object_parent_id_idx">
+            <column name="parent_id"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="object"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2020-12-27-02-080" author="Vladimir">
+        <comment>Статусы задач</comment>
+        <createTable tableName="task_status" remarks="Статусы задач">
+            <column name="id" type="bigint" remarks="Идентификатор" autoIncrement="true" startWith="10000">
+                <constraints primaryKeyName="task_status_id_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="status" type="varchar(10)" remarks="Статус">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text" remarks="Описание"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="task_status"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2020-12-27-02-090" author="Vladimir">
+        <comment>Заполнение статусов задач</comment>
+        <insert tableName="task_status">
+            <column name="id" valueNumeric="10"/>
+            <column name="status" value="Новая"/>
+            <column name="description" value="Новая задача"/>
+        </insert>
+        <insert tableName="task_status">
+            <column name="id" valueNumeric="20"/>
+            <column name="status" value="Назначена"/>
+            <column name="description" value="Назначена на исполнителя"/>
+        </insert>
+        <insert tableName="task_status">
+            <column name="id" valueNumeric="30"/>
+            <column name="status" value="В работе"/>
+            <column name="description" value="В работе"/>
+        </insert>
+        <insert tableName="task_status">
+            <column name="id" valueNumeric="40"/>
+            <column name="status" value="Выполнена"/>
+            <column name="description" value="Выполнена"/>
+        </insert>
+        <insert tableName="task_status">
+            <column name="id" valueNumeric="50"/>
+            <column name="status" value="Закрыта"/>
+            <column name="description" value="Закрыта"/>
+        </insert>
+        <rollback>
+            <delete tableName="task_status">
+                <where>id in (10, 20, 30, 40, 50)</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2020-12-27-02-100" author="Vladimir">
+        <comment>Задачи на проверку объектов</comment>
+        <createTable tableName="task" remarks="Задачи на проверку объектов">
+            <column name="id" type="bigint" remarks="Идентификатор" autoIncrement="true" startWith="10000">
+                <constraints primaryKeyName="task_id_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)" remarks="Название">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status_id" type="bigint" defaultValue="10" remarks="Статус задачи">
+                <constraints foreignKeyName="status_id_fk" referencedTableName="task_status"
+                             referencedColumnNames="id" nullable="false"/>
+            </column>
+            <column name="dt_begin" type="timestamp with time zone" remarks="Дата и время, когда нужно начать задачу"/>
+            <column name="dt_end" type="timestamp with time zone" remarks="Дата и время, когда нужно завершить задачу"/>
+            <column name="dt_completed" type="timestamp with time zone" remarks="Дата и время завершения задачи"/>
+            <column name="checklist_id" type="bigint" remarks="Чек-лист">
+                <constraints foreignKeyName="task_checklist_id_fk" referencedTableName="checklist" referencedColumnNames="id"/>
+            </column>
+            <column name="description" type="text" remarks="Описание"/>
+        </createTable>
+        <createIndex tableName="task" indexName="task_checklist_id_idx">
+            <column name="checklist_id"/>
+        </createIndex>
+        <createIndex tableName="task" indexName="task_status_id_idx">
+            <column name="status_id"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="task"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2020-12-27-02-110" author="Vladimir">
+        <comment>Связь задач с объектам</comment>
+        <createTable tableName="crs_task_object" remarks="Связь задач с объектам">
+            <column name="id" type="bigint" remarks="Идентификатор" autoIncrement="true" startWith="10000">
+                <constraints primaryKeyName="crs_task_object_id_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="task_id" type="bigint" remarks="Задача">
+                <constraints foreignKeyName="crs_task_object_task_id_fk" referencedTableName="task" referencedColumnNames="id" nullable="false"/>
+            </column>
+            <column name="object_id" type="bigint" remarks="Проверяемый объект">
+                <constraints foreignKeyName="crs_task_object_object_id_fk" referencedTableName="object" referencedColumnNames="id" nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="crs_task_object" indexName="crs_task_object_task_id_object_id_idx">
+            <column name="task_id"/>
+            <column name="object_id"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="crs_task_object"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2020-12-27-02-120" author="Vladimir">
+        <comment>Результаты проведенных проверок</comment>
+        <createTable tableName="task_result" remarks="Результаты проведенных проверок">
+            <column name="id" type="bigint" remarks="Идентификатор" autoIncrement="true" startWith="10000">
+                <constraints primaryKeyName="task_result_id_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="task_id" type="bigint" remarks="Задача">
+                <constraints foreignKeyName="task_result_task_id_fk" referencedTableName="task" referencedColumnNames="id"/>
+            </column>
+            <column name="checklist_id" type="bigint" remarks="Чек-лист">
+                <constraints foreignKeyName="task_result_checklist_id_fk" referencedTableName="checklist" referencedColumnNames="id"/>
+            </column>
+            <column name="item_id" type="bigint" remarks="Элемент чек-листа">
+                <constraints foreignKeyName="task_result_item_id_fk" referencedTableName="item" referencedColumnNames="id"/>
+            </column>
+            <column name="value_id" type="bigint" remarks="Поле для хранение ссылки на справочник">
+                <constraints foreignKeyName="task_result_value_id_fk" referencedTableName="value_list" referencedColumnNames="id"/>
+            </column>
+            <column name="number_value" type="numeric" remarks="Поле для хранения числовых значений"/>
+            <column name="text_value" type="text" remarks="Поле для хранения текстовых значений"/>
+            <column name="date_value" type="timestamp with time zone" remarks="Поле для хранение даты и времени"/>
+        </createTable>
+        <createIndex tableName="task_result" indexName="task_result_task_id_checklist_id_item_id_idx">
+            <column name="task_id"/>
+            <column name="checklist_id"/>
+            <column name="item_id"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="task_result"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2020-12-27-02-900" author="Vladimir">
+        <tagDatabase tag="init-0.0.1"/>
+    </changeSet>
+</databaseChangeLog>

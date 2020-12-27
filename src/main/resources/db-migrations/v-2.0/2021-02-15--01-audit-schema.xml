@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="2021-02-15-01-001" author="Vladimir">
+        <comment>Поля для аудита исполнителей</comment>
+        <addColumn tableName="executor">
+            <column name="version"       type="bigint"                   remarks="Версия записи"/>
+            <column name="created_date"  type="timestamp with time zone" remarks="Дата и время создания записи"/>
+            <column name="created_by"    type="bigint"                   remarks="Автор создания записи"/>
+            <column name="modified_date" type="timestamp with time zone" remarks="Дата и время изменения записи"/>
+            <column name="modified_by"   type="bigint"                   remarks="Автор изменения записи"/>
+            <column name="reason"        type="text"                     remarks="Причина создания/изменения записи"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="executor" columnName="version"/>
+            <dropColumn tableName="executor" columnName="created_date"/>
+            <dropColumn tableName="executor" columnName="created_by"/>
+            <dropColumn tableName="executor" columnName="modified_date"/>
+            <dropColumn tableName="executor" columnName="modified_by"/>
+            <dropColumn tableName="executor" columnName="reason"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2021-02-15-01-100" author="Vladimir">
+        <tagDatabase tag="audit-2.0.0"/>
+    </changeSet>
+</databaseChangeLog>

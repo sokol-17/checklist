@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="2020-12-27-02-010" author="Vladimir">
+        <comment>Пользователи</comment>
+        <createTable tableName="users" remarks="Пользователи">
+            <column name="id" type="bigint" remarks="Идентификатор" autoIncrement="true" startWith="10000">
+                <constraints primaryKeyName="users_id_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="login" type="varchar(15)" remarks="Логин">
+                <constraints uniqueConstraintName="users_login" unique="true" nullable="false"/>
+            </column>
+            <column name="password" type="varchar(50)" remarks="Пароль">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)" remarks="ФИО">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(15)" remarks="Эл.почта">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text" remarks="Описание"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="users"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2020-12-27-02-900" author="Vladimir">
+        <tagDatabase tag="users-0.0.1"/>
+    </changeSet>
+</databaseChangeLog>

@@ -203,12 +203,17 @@ create table if not exists task_result (
   , task_id      bigint
   , checklist_id bigint
   , item_id      bigint
+  , number_value numeric
+  , text_value   text
+  , date_value   date
+  , value_id     bigint
 );
 
 alter table if exists task_result add constraint task_result_id_pk primary key (id);
 alter table if exists task_result add constraint task_result_task_id_fk foreign key (task_id) references task(id);
 alter table if exists task_result add constraint task_result_checklist_id_fk foreign key (checklist_id) references checklist(id);
 alter table if exists task_result add constraint task_result_item_id_fk foreign key (item_id) references item(id);
+alter table if exists task_result add constraint task_result_value_id_fk foreign key (value_id) references value_list(id);
 create index if not exists task_result_task_id_checklist_id_item_id_idx on task_result(task_id, checklist_id, item_id);
 alter sequence if exists task_result_id_seq restart with 10000;
 
@@ -217,3 +222,7 @@ comment on column task_result.id           is 'Идентификатор';
 comment on column task_result.task_id      is 'Задача';
 comment on column task_result.checklist_id is 'Чек-лист';
 comment on column task_result.item_id      is 'Элемент чек-листа';
+comment on column task_result.number_value is 'Поле для хранения числовых значений';
+comment on column task_result.text_value   is 'Поле для хранения текстовых значений';
+comment on column task_result.date_value   is 'Поле для хранение даты и времени';
+comment on column task_result.value_id     is 'Поле для хранение ссылки на справочник';
