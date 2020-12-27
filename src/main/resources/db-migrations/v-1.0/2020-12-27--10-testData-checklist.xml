@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="2020-12-27-10-010" author="Vladimir" context="test">
+        <comment>Заполнение тестовыми данными чек-листы</comment>
+        <insert tableName="checklist">
+            <column name="id" valueNumeric="1001"/>
+            <column name="name" value="Проверка пожарной безопасности"/>
+            <column name="description" value="Проверить пожарную безопасность производственных помещений"/>
+        </insert>
+        <insert tableName="checklist">
+            <column name="id" valueNumeric="1002"/>
+            <column name="name" value="Проверка информационной безопасности"/>
+            <column name="description" value="Проверить приложение на основные уязвимости"/>
+        </insert>
+        <rollback>
+            <delete tableName="item_type">
+                <where>id in (1001, 1002)</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+<!--    <changeSet id="2020-12-27-10-015" author="Vladimir" context="test">-->
+<!--        <comment>Заполнение тестовыми данными элементы чек-листов</comment>-->
+<!--        <insert tableName="item">-->
+<!--            <column name="id" valueNumeric="1001"/>-->
+<!--            <column name="type_id" valueNumeric="10"/>-->
+<!--            <column name="name" value=""/>-->
+<!--            <column name="is_required" valueBoolean=""/>-->
+<!--            <column name="is_available" valueBoolean=""/>-->
+<!--            <column name="list_id" valueNumeric=""/>-->
+<!--            <column name="mask" value=""/>-->
+<!--            <column name="min" valueNumeric=""/>-->
+<!--            <column name="max" valueNumeric=""/>-->
+<!--            <column name="description" value=""/>-->
+<!--        </insert>-->
+
+<!--        <rollback>-->
+<!--            <delete tableName="item">-->
+<!--                <where>id in (1001, 1002)</where>-->
+<!--            </delete>-->
+<!--        </rollback>-->
+<!--    </changeSet>-->
+
+    <changeSet id="2020-12-27-10-900" author="Vladimir" context="test">
+        <tagDatabase tag="testData-0.0.1"/>
+    </changeSet>
+</databaseChangeLog>
